@@ -1,6 +1,6 @@
 import streamlit as st
-import google.generativeai as genai
-from fpdf import FPDF
+from reqiurement.txt import google.generativeai as genai
+import FPDF
 import random
 import datetime
 
@@ -95,3 +95,4 @@ if st.session_state.history:
 st.divider()
 st.markdown("🌐 [Find Nearby Vet Clinics](https://www.google.com/maps/search/vet+clinic)")
 st.caption("⚠️ This AI provides general suggestions. Always consult a real vet for emergencies.")
+
