@@ -1,5 +1,5 @@
 import streamlit as st
-from openai import OpenAI
+import google.generativeai as genai
 from fpdf import FPDF
 import random
 import datetime
@@ -7,10 +7,14 @@ import datetime
 # -------- CONFIG --------
 st.set_page_config(page_title="AI Pet Doctor 🐾", page_icon="🐕", layout="centered")
 
-client = OpenAI(api_key="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")  # 👈 apni OpenAI key yahan daalo
+# ✅ Configure Gemini API key
+genai.configure(api_key="AIzaSyDdxIu4oaU2lpFJZv5S70fCmA1zgl4zIjQ")
+
+# ✅ Initialize the Gemini model
+model = genai.GenerativeModel("gemini-1.5-pro")
 
 # -------- HEADER -------
-st.title("🐾 AI Pet Doctor  💙")
+st.title("🐾 AI Pet Doctor 💙")
 st.caption("Smart AI app for pet health, happiness, and emergency care 🐶🐱🐰🐦")
 
 # -------- DAILY TIP --------
@@ -36,14 +40,18 @@ def generate_response(pet, problem):
     if any(word in problem.lower() for word in emergencies):
         return "🚨 Emergency detected! Please take your pet to the nearest vet immediately."
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a kind and expert pet doctor AI."},
-            {"role": "user", "content": f"My {pet} has these symptoms: {problem}. Please suggest safe advice."}
-        ]
+    prompt = (
+        f"You are a kind and expert pet doctor AI. "
+        f"My {pet} has these symptoms: {problem}. "
+        f"Please suggest safe, practical, and friendly advice."
     )
-    return response.choices[0].message.content.strip()
+
+    # ✅ Gemini call (replaced OpenAI part)
+    try:
+        response = model.generate_content(prompt)
+        return response.text.strip() if response and response.text else "Sorry, I couldn’t generate a response."
+    except Exception as e:
+        return f"⚠️ Error generating response: {e}"
 
 # -------- SAVE CHAT TO PDF --------
 def save_chat_to_pdf(chat):
